@@ -1,0 +1,212 @@
+---
+title: '- PROBABILITY AND STOCHASTIC PROCESSES CAT I Takeaway'
+author: "Getrude Gichuhi"
+date: '2022-07-13'
+output:
+  word_document: default
+  pdf_document: default
+subtitle: Random Walk and Gambler’s Ruin Problem
+---
+Question 1: 
+Peter is in jail and has 20 dollars; he can get out on bail if he has 64 dollars. A guard agrees to make a series of bets with him. If Peter bets A dollar, he wins A dollar with probability 0.55 and loses A dollar with probability 0.45.
+
+Find the probability that he wins 8 dollars before losing all of his money if:
+  a. he bets 5 dollars each time (timid strategy).
+  
+  q(z)=(1-(q/p)^i)/(1-(q/p)^N)
+
+```{r}
+
+i <- 5
+N <- 8
+p <- .55
+q <- .45
+
+result_timid <- (1-(q/p)^i) / (1-(q/p)^N)
+
+result_timid
+
+```
+Therefore, the probability of Peter winning 8 dollars with a timid strategy is 0.7924987 or 79.2%
+
+
+b. he bets, each time, as much as possible but not more than necessary to bring his fortune up to 64 dollars (bold strategy).
+
+q0=0
+q1=0.55(q2)+0.45(q0)
+q2=0.55(q4)+0.45(q0)
+q4=0.55(q8)+0.45(q0)
+q8=1
+
+```{r}
+start_dollars <- 20
+out_on_bail <- c()
+
+for (j in 20:100000) {
+  samples <- c(start_dollars)
+  for (x in 20: 100) {
+    samples <- append(samples, sample(c(sum(samples),-sum(samples)), size=20, replace=T, prob=c(.55,.45)))
+    if (sum(samples) >= 64){
+      out_on_bail <- append(out_on_bail, 1)
+      break
+    } else if (sum(samples) <= 0) {
+      break
+    }
+  }
+}  
+
+sum(out_on_bail) / 100000
+
+```
+The probability of Peter winning with a bold strategy is 0.64394 or 64.39%
+
+
+```{r}
+q_0 <- 0
+q_64 <- 20
+
+q_4 <- 0.55*(q_64)+0.45*(q_0)
+q_2 <- 0.55*(q_4)+0.45*(q_0)
+result_bold <- 0.55*(q_2)+0.45*(q_0)
+
+result_bold
+```
+
+
+
+c. Which strategy gives Smith the better chance of getting out of jail?
+
+The timid strategy is better than the bold strategy, therefore Timid is the best strategy to use.
+
+
+Question 2:
+Derive the formulas for the Gambler’s Ruin Problem for situation when 𝑝 = 𝑞 and 𝑝 ≠ 𝑞. 
+
+Answer: Consider Peter who starts with an intial luck of $$ $1$$ and then on each successive gamble he will either win$$  $1 $$ or loose $$ $1 $$ 
+
+Therefore p stands for the probability of wining while q is the probability of loosing which is represented as $$ q=1-p $$
+
+
+In general the idea is  $$ 0<i< N $$
+
+While the game proceeds $$ {Rn: n>=0} $$ 
+
+forms a random walk. 
+
+$$Rn = ∆1 + · · · + ∆n, R0 = i,
+ $$
+
+Where $${∆1}$$ forms an i.i.d. sequence of r.v.s distributed as $$P(∆ = i) = p,    P(∆ = -1) =q=1-P$$
+
+Let $$ Pi = min{n≥0: Rn Σ{0,N}|Ro = i$$
+
+when either $$Rn = 0 (when the game stops)$$
+gambler is ruined
+or 
+$$ Rn = N (when Peter wins)$$
+$$Pi = PPi+1 + ΣPi-1$$
+$$1≤i≤N-1$$
+$$∆1 = 1 or ∆1 = -1$$
+For $$ P+q=1 $$
+
+$$PPi+Σpi = PPi+1 + qPi+1$$
+$$=Pi+1 -Pi =q/p(Pi-Pi-1)$$
+
+therefore, $$P2-Pi = (q/p)(P1-Po) = (q/p)P1 for Po=0$$
+
+so: $$P3-P2 =(q/p)(P2-P1)=(q/p)^2$$
+
+Generally, 
+
+$$Pi+1 -Pi =(q/p)^i P1$$
+
+$$0<i<N$$
+Thus
+$$Pi+1 -P1 = Σ^ik=1(Pk+1 -Pk)$$
+
+$$Σ^ik=1(q/p)^kP1$$
+
+Which gies $$Pi+1 = P1+P1Σ^ik=1(q/p)^k =PiΣ^ik=0(q/p)^k $$
+
+$$ {P1 \frac {1-(q/p)^i+1}{1-q/p}  if P ≠ q
+P1(i+1) if p =q=0.5} $$
+
+Using geometric series equation 
+
+$$Σ^in=o =\frac{1-a^(i+1)}{1-a} $$ 
+
+for any a and integer i≥1
+
+Choosing $$ i =N-1  
+and PN=1 $$
+
+
+$$1 =PN = {P1 \frac {1-(q/p)^N}{1-q/p}  if P ≠ q
+1, N if p =q=0.5}$$
+
+we therefore conclude 
+$$P1 = {\frac {1-(q/p)}{1-q/p} , if P ≠ q
+\frac{i}{N}, if p =q=0.5}$$
+
+
+Please Note $$1-Pi$$ 
+
+is the probability of ruin
+
+Question 2b)
+Also describe how to becoming infinitely rich or getting ruined in the same Gambler’s Ruin setting 
+
+Answer
+$$if P>0.5$$
+then $$\frac {P}{q}<1$$
+thus 
+$$P1 = {\frac {1-(q/p)}{1-q/p} , if P ≠ q
+\frac{i}{N}, if p =q=0.5}$$
+No winning value in this case
+$$ = lim Pi = 1-(\frac{q}{p})^i>0, P>0.5$$
+No winning value in this case.Therefore he is in favor of winning
+If $$P≤0.5, then \frac{q}{p}≥1$$
+thus 
+$$lim Pi=O, P≤0.5$$
+Peter is not in favor of being ruined
+$$N→∞$$
+Therefore it means that P>0.5 is on Peter's favor 
+
+Question 3:
+
+Tom starts with $5, and p = 0.63: What is the probability that Tom obtains a fortune of N = 12 without going broke?
+
+
+$$i=5,N=12 \text{ and } q=1-p=0.37$$
+hence
+$$\frac{q}{p}=\frac{37}{63}$$
+$$P_2 = \frac{1-(37/63)^5}{1-(37/63)^{12}} = \frac{0.93012}{0.99832} = 0.9317$$
+
+
+What is the probability that Tom will become infinitely rich? If Tom instead started with i = $2, what is the probability that he would go broke?
+
+$$i =2 $$
+$$(\frac{q}{p})^i = (\frac{37}{63})^2 = 0.3449$$
+Question 5 
+
+Collins bought a share of stock for $$$10$$, and it is believed that the stock price moves (day by day) as a simple random walk with p = 0.6. What is the probability that Collins’ stock reaches the high value of $$$25$$ before the low value of $$$4$$?
+
+Answer 
+a = 25
+b = 4
+p = 0.6
+q = 0.4
+
+$$ p(a) = (\frac{1-(\frac{q}{p})^b{1-(\frac{q}{p})^(a+b)})$$
+```{r}
+a <- 25
+b <- 4
+p <- 0.6
+q <- 0.4
+
+P <- (1-(q/p)^b)/(1 -(q/p)^(a+b))
+
+P
+```
+
+
